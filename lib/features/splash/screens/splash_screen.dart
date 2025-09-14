@@ -23,14 +23,14 @@ class _SplashScreenState extends State<SplashScreen> {
 
     if (user != null) {
       // User already signed in → go to role selection, pass email as argument
-      Navigator.pushReplacementNamed(
+      Navigator.pushNamed(
         context,
         AppRouter.roleSelec,
         arguments: user.email ?? '',
       );
     } else {
       // User not signed in → go to login page
-      Navigator.pushReplacementNamed(context, AppRouter.login);
+      Navigator.pushNamed(context, AppRouter.login);
     }
   }
 

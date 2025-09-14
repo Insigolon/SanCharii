@@ -10,7 +10,6 @@ import 'features/home/screens/conductor_dash.dart';
 import 'features/auth/screens/conductor_info.dart';
 import 'features/home/screens/dest.dart';
 import 'features/home/screens/passenger.dart';
-import 'features/home/screens/PBT_passenger.dart';
 import 'features/home/screens/slom.dart';
 import 'features/home/screens/route.dart';
 
@@ -23,7 +22,6 @@ class AppRouter {
   static const String conductorInfo = '/conductorInfo';
   static const String dest = '/dest';
   static const String passenger = '/passenger';
-  static const String pbtPassenger = '/pbtPassenger';
   static const String slom = '/slom';
   static const String route = '/route';
 
@@ -52,8 +50,6 @@ class AppRouter {
         return MaterialPageRoute(builder: (_) => DestScreen());
       case passenger:
         return MaterialPageRoute(builder: (_) => PassengerScreen());
-      case pbtPassenger:
-        return MaterialPageRoute(builder: (_) => PbtPassengerScreen());
       case slom:
         return MaterialPageRoute(builder: (_) => SlomScreen());
       case route:

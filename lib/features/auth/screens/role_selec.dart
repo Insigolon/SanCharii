@@ -6,12 +6,12 @@ class RoleSelecScreen extends StatelessWidget {
   const RoleSelecScreen({super.key, required this.userEmail});
 
   Future<void> _selectRole(BuildContext context, String role) async {
-    // TODO: Save role for this user via backend
+    // ADARSH YOU NEED TO MAKE SURE THE ROLE IS SAVED WITH THE USER IN FIREBASE
 
     if (role == "passenger") {
-      Navigator.pushReplacementNamed(context, '/passengerHome');
+      Navigator.pushNamed(context, '/passenger');
     } else {
-      Navigator.pushReplacementNamed(context, '/conductorHome');
+      Navigator.pushNamed(context, '/conductorInfo');
     }
   }
 
@@ -30,7 +30,7 @@ class RoleSelecScreen extends StatelessWidget {
             ),
           ),
 
-          // Passenger button - fixed distance from top
+          // Passenger button fixed distance from top
           Positioned(
             top: screenHeight * 0.28, // 15% from top
             left: 0,
