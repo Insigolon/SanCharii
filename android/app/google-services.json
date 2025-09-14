@@ -41,6 +41,35 @@
           ]
         }
       }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1082593076084:android:32bf925aa69b2d1b3f8221",
+        "android_client_info": {
+          "package_name": "com.example.new_sanchari"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1082593076084-5rfqfhue96ii9qnqe9945qfc5mpbhl38.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAZDagA82r5RbhapX9pkS3U1Mpv9CoQZ8s"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1082593076084-5rfqfhue96ii9qnqe9945qfc5mpbhl38.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
     }
   ],
   "configuration_version": "1"

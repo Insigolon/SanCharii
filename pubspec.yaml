@@ -28,6 +28,7 @@ flutter:
   assets:
     - assets/images/SANCHARI.png
     - assets/images/Background_filler.png
+    - assets/images/Role_Selection.png
 
 flutter_native_splash:
   color: "#000000"

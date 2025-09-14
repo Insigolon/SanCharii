@@ -1,17 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../../../app_router.dart';
-import '../../auth/screens/role_selec.dart'; // ✅ Import role selection
+import '../../auth/screens/role_selec.dart'; // Role selection screen
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
   @override
-  State<LoginScreen> createState() => _LoginPageState();
+  State<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _LoginPageState extends State<LoginScreen> {
-  final _nameController = TextEditingController();
+class _LoginScreenState extends State<LoginScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
 
@@ -30,10 +29,14 @@ class _LoginPageState extends State<LoginScreen> {
 
   @override
   void dispose() {
-    _nameController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
+  }
+
+  bool _isValidEmail(String email) {
+    final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+    return emailRegex.hasMatch(email);
   }
 
   Future<void> _handleLogin() async {
@@ -45,16 +48,19 @@ class _LoginPageState extends State<LoginScreen> {
       return;
     }
 
+    if (!_isValidEmail(email)) {
+      _showSnackBar("Please enter a valid email address.");
+      return;
+    }
+
     setState(() => _isLoading = true);
 
     try {
-      // ✅ Firebase Auth login
       final UserCredential userCred = await FirebaseAuth.instance
           .signInWithEmailAndPassword(email: email, password: password);
 
       final user = userCred.user;
       if (user != null) {
-        // ✅ Navigate to role selection with email
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
@@ -63,7 +69,21 @@ class _LoginPageState extends State<LoginScreen> {
         );
       }
     } on FirebaseAuthException catch (e) {
-      _showSnackBar(e.message ?? "Login failed. Please try again.");
+      String message;
+      switch (e.code) {
+        case 'user-not-found':
+          message = 'No account found with this email.';
+          break;
+        case 'wrong-password':
+          message = 'Incorrect password.';
+          break;
+        case 'invalid-email':
+          message = 'Email is invalid.';
+          break;
+        default:
+          message = 'Login failed: ${e.message}';
+      }
+      _showSnackBar(message);
     } catch (e) {
       _showSnackBar("Unexpected error: $e");
     } finally {
@@ -93,7 +113,7 @@ class _LoginPageState extends State<LoginScreen> {
           children: [
             Container(color: Colors.black),
 
-            // ✅ Show progress indicator when loading
+            // Loading indicator
             if (_isLoading)
               const Center(
                 child: CircularProgressIndicator(color: Colors.cyanAccent),
@@ -102,7 +122,6 @@ class _LoginPageState extends State<LoginScreen> {
             if (!_isLoading)
               Stack(
                 children: [
-                  // Fade-in background image (if you want one later)
                   Center(
                     child: AnimatedOpacity(
                       opacity: _visible ? 1.0 : 0.0,
@@ -116,7 +135,6 @@ class _LoginPageState extends State<LoginScreen> {
                     ),
                   ),
 
-                  // Welcome text
                   Positioned(
                     top: screenHeight * 0.12,
                     left: 0,
@@ -147,7 +165,6 @@ class _LoginPageState extends State<LoginScreen> {
                     ),
                   ),
 
-                  // Login form
                   Align(
                     alignment: Alignment.bottomCenter,
                     child: SingleChildScrollView(
@@ -166,23 +183,26 @@ class _LoginPageState extends State<LoginScreen> {
                             const SizedBox(height: 12),
                             TextField(
                               controller: _emailController,
+                              autofocus: true,
+                              keyboardType: TextInputType.emailAddress,
+                              textInputAction: TextInputAction.next,
                               style: const TextStyle(color: Colors.white),
-                              decoration: _inputDecoration(
-                                "Phone Number/Email",
-                              ),
+                              decoration: _inputDecoration("Email"),
                             ),
                             const SizedBox(height: 12),
                             TextField(
                               controller: _passwordController,
-                              style: const TextStyle(color: Colors.white),
                               obscureText: true,
+                              textInputAction: TextInputAction.done,
+                              onSubmitted: (_) => _handleLogin(),
+                              style: const TextStyle(color: Colors.white),
                               decoration: _inputDecoration("Password"),
                             ),
                             const SizedBox(height: 20),
                             SizedBox(
                               width: double.infinity,
                               child: ElevatedButton(
-                                onPressed: _handleLogin,
+                                onPressed: _isLoading ? null : _handleLogin,
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: const Color(0xFF14B8D1),
                                   foregroundColor: Colors.black,

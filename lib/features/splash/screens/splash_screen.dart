@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-// Adjust path if needed
-import '/app_router.dart'; // Import router to navigate by route name
+import 'package:firebase_auth/firebase_auth.dart';
+import '../../../app_router.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -14,32 +14,34 @@ class _SplashScreenState extends State<SplashScreen> {
   void initState() {
     super.initState();
 
-    // Navigate to login after 2.5 seconds
-    Future.delayed(const Duration(seconds: 2), () {
+    // Wait for 2 seconds, then check login status
+    Future.delayed(const Duration(seconds: 2), _checkLoginStatus);
+  }
+
+  void _checkLoginStatus() {
+    final user = FirebaseAuth.instance.currentUser;
+
+    if (user != null) {
+      // User already signed in → go to role selection, pass email as argument
+      Navigator.pushReplacementNamed(
+        context,
+        AppRouter.roleSelec,
+        arguments: user.email ?? '',
+      );
+    } else {
+      // User not signed in → go to login page
       Navigator.pushReplacementNamed(context, AppRouter.login);
-    });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black, // matches your Figma design
-      body: SafeArea(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            // App logo image
-            Center(
-              child: Image.asset(
-                'assets/images/SANCHARI.png',
-                width:
-                    MediaQuery.of(context).size.width *
-                    0.6, // 60% of screen width
-              ),
-            ),
-
-            const SizedBox(height: 50),
-          ],
+      backgroundColor: Colors.black,
+      body: Center(
+        child: Image.asset(
+          'assets/images/SANCHARI.png',
+          width: MediaQuery.of(context).size.width * 0.6,
         ),
       ),
     );
