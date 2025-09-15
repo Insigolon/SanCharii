@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class ConductorDashScreen extends StatefulWidget {
   const ConductorDashScreen({super.key});
@@ -8,7 +10,63 @@ class ConductorDashScreen extends StatefulWidget {
 }
 
 class _ConductorDashScreenState extends State<ConductorDashScreen> {
+  // Controllers for input fields
+  final TextEditingController _routeController = TextEditingController();
+  final TextEditingController _startController = TextEditingController();
+  final TextEditingController _destinationController = TextEditingController();
+
+  // List to store stops
   List<String?> stops = List.generate(6, (_) => null); // 6 stop slots
+
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final String userEmail =
+      FirebaseAuth.instance.currentUser?.email ?? "unknown_user";
+
+  @override
+  void initState() {
+    super.initState();
+    _loadDashboard();
+  }
+
+  // Load existing dashboard data from Firestore
+  Future<void> _loadDashboard() async {
+    final doc = await _firestore.collection('conductors').doc(userEmail).get();
+    if (doc.exists) {
+      final data = doc.data()!;
+      _routeController.text = data['routeNo'] ?? '';
+      _startController.text = data['startLocation'] ?? '';
+      _destinationController.text = data['destination'] ?? '';
+      final loadedStops = List<String?>.from(data['stops'] ?? []);
+      setState(() {
+        for (int i = 0; i < stops.length && i < loadedStops.length; i++) {
+          stops[i] = loadedStops[i];
+        }
+      });
+    }
+  }
+
+  // Save dashboard data to Firestore
+  Future<void> _saveDashboard() async {
+    try {
+      await _firestore.collection('conductors').doc(userEmail).set({
+        'routeNo': _routeController.text.trim(),
+        'startLocation': _startController.text.trim(),
+        'destination': _destinationController.text.trim(),
+        'stops': stops,
+        'email': userEmail,
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Dashboard saved successfully!"),
+          backgroundColor: Colors.black,
+        ),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("Error saving dashboard: $e")));
+    }
+  }
 
   void _addStop(int index) {
     final TextEditingController _stopController = TextEditingController();
@@ -60,40 +118,52 @@ class _ConductorDashScreenState extends State<ConductorDashScreen> {
       backgroundColor: Colors.black,
       body: Stack(
         children: [
-          //  Background Image
+          // Background Image
           Positioned(
             left: 0,
             bottom: 0,
             child: Image.asset(
-              'assets/images/Bus_stop.png',
-              height: 500, // Adjust size so it’s subtle
+              '',
+              height: 500, // Adjust size as needed
               fit: BoxFit.contain,
             ),
           ),
 
-          //  Foreground Content
+          // Foreground Content
           SafeArea(
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(20),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  //  Conductor Name / Route / Locations
+                  // Conductor Name / Route / Locations
                   const Text(
                     "Conductor: User Name",
                     style: TextStyle(color: Colors.white, fontSize: 18),
                   ),
                   const SizedBox(height: 10),
 
-                  _buildInputField("Route No."),
+                  _buildInputField("Route No.", _routeController),
                   const SizedBox(height: 10),
-                  _buildInputField("Starting Location"),
+                  _buildInputField("Starting Location", _startController),
                   const SizedBox(height: 10),
-                  _buildInputField("Destination"),
+                  _buildInputField("Destination", _destinationController),
+
+                  const SizedBox(height: 20),
+
+                  // Save button
+                  ElevatedButton(
+                    onPressed: _saveDashboard,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.white,
+                      foregroundColor: Colors.black,
+                    ),
+                    child: const Text("Save Dashboard"),
+                  ),
 
                   const SizedBox(height: 30),
 
-                  //  "Add stops here" text
+                  // "Add stops here" text
                   const Text(
                     "Add stops here:",
                     style: TextStyle(
@@ -150,8 +220,9 @@ class _ConductorDashScreenState extends State<ConductorDashScreen> {
     );
   }
 
-  Widget _buildInputField(String hint) {
+  Widget _buildInputField(String hint, TextEditingController controller) {
     return TextField(
+      controller: controller,
       style: const TextStyle(color: Colors.white),
       decoration: InputDecoration(
         hintText: hint,

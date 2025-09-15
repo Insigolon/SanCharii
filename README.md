@@ -1,16 +1,40 @@
-# new_sanchari
+# SanChari
 
-A new Flutter project.
+SanChari is a **real-time bus tracking and route management app** built with Flutter.  
+It allows passengers to search for routes, view bus locations, and see previously taken buses — while conductors can log in, update their route information, and manage bus stops in real time.
 
-## Getting Started
+---
+# Features
 
-This project is a starting point for a Flutter application.
+### Passenger Features
+- **Interactive Map** – Displays available buses and routes based on your start location and destination.
+- **Smart Search** – Choose start location manually if location permission is not granted.
+- **Previous Buses Taken** – Quick access to recently taken bus routes (e.g., MF21, 25B).
+- **Smooth UI** – Draggable bottom sheet, clean design, and easy navigation.
+- **Offline Friendly** – Map and route search still work with manual input if GPS is disabled.
 
-A few resources to get you started if this is your first Flutter project:
+###  Conductor Features
+- **Conductor Info Setup** – Enter route number and conductor name/ID (saved to Firestore).
+- **Dashboard** – View and edit:
+  - Route number
+  - Start and destination points
+  - List of stops (add/remove dynamically)
+- **Secure Auth** – Integrated with Firebase Authentication.
+- **Persistent Data** – All conductor data is stored in Firestore so it stays synced across devices.
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+---
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+##  Tech Stack
+
+- **Frontend:** Flutter (Dart)
+- **Backend:** Firebase Firestore + Firebase Auth
+- **Maps:** Google Maps SDK
+- **State Management:** Flutter's built-in `StatefulWidget` (can be upgraded to Provider/Bloc if needed)
+
+
+## 🔧 Installation & Setup
+
+1. **Clone this repository**
+   ```bash
+   git clone https://github.com/your-username/SanChari.git
+   cd SanChari
