@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -12,8 +13,6 @@ class ConductorInfoScreen extends StatefulWidget {
 class _ConductorInfoScreenState extends State<ConductorInfoScreen> {
   final TextEditingController _routeController = TextEditingController();
   final TextEditingController _nameController = TextEditingController();
-
-  bool _isLoading = false;
 
   Future<void> _saveConductorInfo() async {
     final routeNumber = _routeController.text.trim();
@@ -40,31 +39,50 @@ class _ConductorInfoScreenState extends State<ConductorInfoScreen> {
       return;
     }
 
-    try {
-      setState(() => _isLoading = true);
+    // Show blocking loading dialog
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) =>
+          const Center(child: CircularProgressIndicator(color: Colors.white)),
+    );
 
+    try {
       final firestore = FirebaseFirestore.instance;
 
-      await firestore.collection("conductors").doc(user.email).set({
-        "email": user.email,
-        "routeNumber": routeNumber,
-        "conductorName": conductorName,
-        "registered": true,
-        "timestamp": FieldValue.serverTimestamp(),
-      });
+      // Add timeout protection
+      await firestore
+          .collection("conductors")
+          .doc(user.email)
+          .set({
+            "email": user.email,
+            "routeNumber": routeNumber,
+            "conductorName": conductorName,
+            "registered": true,
+            "timestamp": FieldValue.serverTimestamp(),
+          })
+          .timeout(const Duration(seconds: 5));
 
       if (!mounted) return;
 
+      Navigator.pop(context); // close loading dialog
       Navigator.pushReplacementNamed(context, '/conductorDash');
+    } on TimeoutException catch (_) {
+      Navigator.pop(context);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Request timed out. Please check your internet."),
+          backgroundColor: Colors.orange,
+        ),
+      );
     } catch (e) {
+      Navigator.pop(context);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text("Error saving info: $e"),
           backgroundColor: Colors.red,
         ),
       );
-    } finally {
-      if (mounted) setState(() => _isLoading = false);
     }
   }
 
@@ -82,11 +100,10 @@ class _ConductorInfoScreenState extends State<ConductorInfoScreen> {
                 children: [
                   Image.asset(
                     'assets/images/Conductor_icon.png',
-                    height: 200, // adjust size
+                    height: 200,
                     width: 200,
                     fit: BoxFit.contain,
                   ),
-
                   const SizedBox(height: 40),
 
                   // Route Number Field
@@ -132,7 +149,7 @@ class _ConductorInfoScreenState extends State<ConductorInfoScreen> {
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
-                      onPressed: _isLoading ? null : _saveConductorInfo,
+                      onPressed: _saveConductorInfo,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.teal,
                         foregroundColor: Colors.white,
@@ -141,12 +158,10 @@ class _ConductorInfoScreenState extends State<ConductorInfoScreen> {
                           borderRadius: BorderRadius.circular(30),
                         ),
                       ),
-                      child: _isLoading
-                          ? const CircularProgressIndicator(color: Colors.white)
-                          : const Text(
-                              "Go to Dashboard",
-                              style: TextStyle(fontSize: 18),
-                            ),
+                      child: const Text(
+                        "Go to Dashboard",
+                        style: TextStyle(fontSize: 18),
+                      ),
                     ),
                   ),
                 ],

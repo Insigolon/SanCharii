@@ -164,7 +164,7 @@ class _PassengerScreenState extends State<PassengerScreen> {
     String imagePath,
   ) {
     return Card(
-      color: Colors.cyan[800],
+      color: Colors.cyan[700],
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       margin: const EdgeInsets.symmetric(vertical: 9),
       child: Padding(

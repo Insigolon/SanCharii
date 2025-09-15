@@ -36,6 +36,7 @@ flutter:
     - assets/images/Bus2.png
     - assets/images/Conductor_icon.png
     - assets/images/Mandala.png
+    - assets/images/Bus_stop.png
 
 flutter_native_splash:
   color: "#000000"

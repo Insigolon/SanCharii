@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart'; // ✅ Add this import
+import 'package:firebase_auth/firebase_auth.dart'; // Add this import
 
 // Import all screens
 import 'features/splash/screens/splash_screen.dart';
